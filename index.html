@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://pyscript.net/releases/2026.7.3/core.css" />
+        <script type="module" src="https://pyscript.net/releases/2026.7.3/core.js"></script>
+    <title>Candidate Verification System</title>
+</head>
+<body>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Share+Tech+Mono&display=swap');
+
+    :root {
+        --gold: #e8bd51;
+        --gold-light: #ffe39a;
+        --navy: #07111b;
+        --panel: #0c1924;
+        --cyan: #48e9ef;
+        --muted: #94a5b5;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px 75px;
+        overflow-x: hidden;
+        position: relative;
+        isolation: isolate;
+        color: #eef3f7;
+        font-family: 'Share Tech Mono', monospace;
+
+        background:
+            radial-gradient(ellipse at 50% 100%,
+                #44361a 0%, transparent 35%),
+            radial-gradient(ellipse at 50% 0%,
+                #142737 0%, transparent 55%),
+            repeating-linear-gradient(
+                135deg,
+                transparent 0px,
+                transparent 30px,
+                #ffffff03 31px,
+                transparent 32px
+            ),
+            #050a10;
+    }
+
+    /* Decorative corner markings */
+    body::before,
+    body::after {
+        content: "";
+        position: fixed;
+        width: 130px;
+        height: 130px;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    body::before {
+        top: 0;
+        left: 0;
+        border-top: 3px solid var(--gold);
+        border-left: 3px solid var(--gold);
+        clip-path: polygon(0 0, 100% 0, 0 100%);
+        background: linear-gradient(135deg, #d7a73822, transparent);
+    }
+
+    body::after {
+        right: 0;
+        bottom: 0;
+        border-right: 3px solid var(--gold);
+        border-bottom: 3px solid var(--gold);
+        clip-path: polygon(100% 0, 100% 100%, 0 100%);
+        background: linear-gradient(315deg, #d7a73822, transparent);
+    }
+
+    /* Academy insignia */
+    .emblem {
+        width: 76px;
+        height: 76px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 20px;
+        border: 2px solid var(--gold);
+        border-radius: 50%;
+        background: linear-gradient(145deg, #182b38, #071019);
+        color: var(--gold-light);
+        font-size: 39px;
+        box-shadow:
+            0 0 0 6px #e8bd5110,
+            0 0 25px #e8bd5120;
+    }
+
+    /* Header */
+    h1 {
+        max-width: 100%;
+        color: var(--gold);
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: clamp(32px, 7vw, 48px);
+        font-weight: 900;
+        letter-spacing: 3px;
+        line-height: 1.05;
+        text-align: center;
+        text-shadow: 0 2px 15px #e8bd5125;
+    }
+
+    .subtitle {
+        margin-top: 12px;
+        color: #aab8c5;
+        font-size: 10px;
+        letter-spacing: 3px;
+        text-align: center;
+        line-height: 1.8;
+    }
+
+    .divider {
+        width: min(100%, 400px);
+        height: 1px;
+        margin: 26px 0;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            var(--gold),
+            transparent
+        );
+    }
+
+    /* Main command panel */
+    form {
+        width: min(100%, 410px);
+        padding: 28px 24px;
+        position: relative;
+        border: 1px solid #a98234;
+        background:
+            linear-gradient(145deg, #10212cdd, #08111bdd);
+        box-shadow:
+            0 15px 45px #0008,
+            inset 0 0 25px #ffffff04;
+        clip-path: polygon(
+            22px 0,
+            100% 0,
+            100% calc(100% - 22px),
+            calc(100% - 22px) 100%,
+            0 100%,
+            0 22px
+        );
+    }
+
+    .form-heading {
+        margin-bottom: 24px;
+        padding-bottom: 13px;
+        border-bottom: 1px solid #e8bd5138;
+        color: var(--gold);
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 2px;
+    }
+
+    .form-heading span {
+        display: block;
+        margin-top: 5px;
+        color: var(--muted);
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 9px;
+        font-weight: normal;
+        letter-spacing: 1px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 9px;
+        color: var(--gold-light);
+        font-size: 11px;
+        letter-spacing: 2px;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        height: 48px;
+        margin-bottom: 22px;
+        padding: 0 14px;
+        outline: none;
+        border: 1px solid #405564;
+        border-radius: 3px;
+        background: #050c12;
+        color: #f5f7fa;
+        font-family: inherit;
+        font-size: 14px;
+        transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
+    input[type="text"]::placeholder {
+        color: #718391;
+    }
+
+    input[type="text"]:focus {
+        border-color: var(--cyan);
+        box-shadow: 0 0 12px #48e9ef18;
+    }
+
+    /* Gold command button */
+    input[type="button"] {
+        width: 100%;
+        min-height: 51px;
+        border: 1px solid var(--gold-light);
+        border-radius: 3px;
+        background: linear-gradient(135deg, #ffe59b, #d3a12d 65%, #ad7b1c);
+        color: #10151a;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 19px;
+        font-weight: 900;
+        letter-spacing: 5px;
+        cursor: pointer;
+        transition: 0.25s ease;
+    }
+
+    input[type="button"]:hover {
+        background: linear-gradient(135deg, #fff0c1, #e8bd51);
+        box-shadow: 0 0 22px #e8bd5135;
+        transform: translateY(-2px);
+    }
+
+    input[type="button"]:active {
+        transform: scale(0.98);
+    }
+
+    /* Verification feedback */
+    #result {
+        width: min(100%, 410px);
+        min-height: 75px;
+        margin-top: 20px;
+        padding: 18px;
+        border: 1px solid #48e9ef70;
+        border-left: 4px solid var(--cyan);
+        background: linear-gradient(110deg, #0c2027, #09131b);
+        color: var(--gold-light);
+        font-size: 12px;
+        line-height: 1.8;
+        overflow-wrap: anywhere;
+        box-shadow: 0 8px 25px #0004;
+    }
+
+    .result-label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--cyan);
+        font-size: 9px;
+        letter-spacing: 2px;
+    }
+
+    /* Bottom identity strip */
+    footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 17px 12px;
+        border-top: 1px solid var(--gold);
+        background: #060b11eF;
+        color: #b7a675;
+        font-size: 9px;
+        letter-spacing: 2px;
+        line-height: 1.8;
+        text-align: center;
+    }
+
+    footer strong {
+        color: var(--gold);
+    }
+
+    @media (max-width: 480px) {
+        body {
+            padding: 30px 16px 90px;
+        }
+
+        .emblem {
+            width: 64px;
+            height: 64px;
+            font-size: 32px;
+        }
+
+        h1 {
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 9px;
+            letter-spacing: 1.5px;
+        }
+
+        form {
+            padding: 24px 18px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            transition: none !important;
+        }
+    }
+</style>
+
+</head>
+
+<body>
+
+<div class="emblem" aria-hidden="true">✦</div>
+
+<h1>COCC CLUB CHECKER</h1>
+
+<p class="subtitle">
+    CADET OFFICER CANDIDATE COURSE<br>
+    CANDIDATE VERIFICATION SYSTEM
+</p>
+
+<div class="divider"></div>
+
+<form>
+    <div class="form-heading">
+        CANDIDATE IDENTIFICATION
+        <span>ENTER YOUR DETAILS TO VERIFY YOUR STATUS</span>
+    </div>
+
+    <label for="fname">01 / FIRST NAME</label>
+    <input
+        type="text"
+        id="fname"
+        placeholder="Enter your first name"
+        autocomplete="given-name"
+        required
+    >
+
+    <label for="surname">02 / LAST NAME</label>
+    <input
+        type="text"
+        id="surname"
+        placeholder="Enter your last name"
+        autocomplete="family-name"
+        required
+    >
+
+    <input
+        type="button"
+        py-click="name_finder"
+        value="VERIFY CANDIDATE"
+    >
+</form>
+
+<div id="result" aria-live="polite">
+    <span class="result-label">SYSTEM STATUS / READY</span>
+    Enter your name to verify your COCC membership.
+</div>
+
+<footer>
+    <strong>COCC CLUB</strong> &nbsp; • &nbsp;
+    CADET OFFICER CANDIDATE COURSE<br>
+    LEAD WITH HONOR • SERVE WITH DISCIPLINE
+</footer>
+
+<script type="py" src="main.py"></script>
+
+    </body>
+</html>
